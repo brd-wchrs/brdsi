@@ -59,10 +59,8 @@
     $radius = $_POST['radius'] ;
     
     $url = 'https://api.twitter.com/1.1/search/tweets.json';
-    $getfield = '?geocode=' . $latitude . ',' .
+    $getfield = '?q=' . $query . '&geocode=' . $latitude . ',' .
                 $longitude . ',' . $radius . 'mi' ;
-
-    echo $getfield;
 
     $requestMethod = 'GET';
     $twitter = new TwitterAPIExchange($settings);
