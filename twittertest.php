@@ -15,9 +15,29 @@
   </head>
   <body>
 
-    <form name="form1" method="" action="">
-      <input type="text" value="#asianproblems">
-      <input type="submit" name="querySubmit" value="Search">
+    <form name="form1" method="POST" action="twittertest.php">
+      <table>
+	<tr>
+	  <td>Query:</td>
+	  <td><input type="text" value="#asianproblems" name="query"></td>
+	</tr>
+	<tr>
+	  <td>Latitude:</td>
+	  <td><input type="text" value="32.09" name="latitude"></td>
+	</tr>
+	<tr>
+	  <td>Longitude:</td>
+	  <td><input type="text" value="-70.012" name="longitude"></td>
+	</tr>
+	<tr>
+	  <td>Radius (mi):</td>
+	  <td><input type="text" value="1000" name="radius"></td>
+	</tr>
+	<tr>
+	  <td><input type="submit" name="querySubmit" value="Search"></td>
+	  <td></td>
+	</tr>
+      </table>
     </form>
 
     <?php
@@ -32,8 +52,18 @@
       'consumer_secret' => "atcvh1uWEdNNZ2hnlUrcrFuE1yTqlnRHDpToVxik"
     );
 
+    /** So yeah, this part grabs the stuff from the textboxes **/
+    $query = $_POST['query'] ;
+    $latitude = $_POST['latitude'] ;
+    $longitude = $_POST['longitude'] ;
+    $radius = $_POST['radius'] ;
+    
     $url = 'https://api.twitter.com/1.1/search/tweets.json';
-    $getfield = '?q=#asianproblems';
+    $getfield = '?geocode=' . $latitude . ',' .
+                $longitude . ',' . $radius . 'mi' ;
+
+    echo $getfield;
+
     $requestMethod = 'GET';
     $twitter = new TwitterAPIExchange($settings);
 
