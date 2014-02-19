@@ -18,10 +18,12 @@
 
     <form name="form1" method="POST" action="twittertrends.php">
       <table>
+	<!--
 	<tr>
 	  <td>Query:</td>
 	  <td><input type="text" value="#asianproblems" name="query"></td>
 	</tr>
+	-->
 	<tr>
 	  <td>Latitude:</td>
 	  <td><input type="text" value="32.09" name="latitude"></td>
@@ -54,23 +56,64 @@
     );
 
     /** So yeah, this part grabs the stuff from the textboxes **/
-    $query = $_POST['query'] ;
+    /** $query = $_POST['query'] ; **/
     $latitude = $_POST['latitude'] ;
     $longitude = $_POST['longitude'] ;
     $radius = $_POST['radius'] ;
-    
+
+
+    /* This creates the url that requests the place with the closest
+       trending information to the GPS coordinates. 
+    */
     $url = 'https://api.twitter.com/1.1/trends/closest.json';
     $getfield = '?lat=' . $latitude . '&long=' . $longitude ; 
 
     $requestMethod = 'GET';
     $twitter = new TwitterAPIExchange($settings);
 
-    $json = json_decode( $twitter->setGetfield($getfield)
-                         ->buildOauth($url, $requestMethod)
-                         ->performRequest(),true);     
+    $closestJSON = json_decode( $twitter->setGetfield($getfield)
+                                ->buildOauth($url, $requestMethod)
+                                ->performRequest(),true);     
 
-    echo $json[0]['country'] . ': ' .  $json[0]['woeid'] . '<br>';
+    /* Echos the country and the WoeID */
+    echo $closestJSON[0]['country'] . ': ' .  $closestJSON[0]['woeid'] . '<br>';
 
+    /** Now we create the URL that requests the trends of the WOEid **/
+    $url = 'https://api.twitter.com/1.1/trends/place.json';
+    $getfield = '?id=' . $closestJSON[0]['woeid'] ;
+
+    echo "<p>Here are the top five trends of the area and the top ten tweets of each:</p>" ;
+
+    $trendsJSON = json_decode( $twitter->setGetfield($getfield)
+                               ->buildOauth($url, $requestMethod)
+                                ->performRequest(),true);
+
+
+    echo '<table>';
+    foreach ( $trendsJSON[0]['trends'] as $trend) {
+      echo '<tr>';
+      echo '<td>' . $trend['name'] ;
+
+      $url = 'https://api.twitter.com/1.1/search/tweets.json';
+      $getfield = '?q=' . $trend['name'] . '&geocode=' . $latitude . ',' .
+                  $longitude . ',' . $radius . 'mi' . '&count=5' ;
+
+      $tweetsJSON = json_decode( $twitter->setGetfield($getfield)
+                                 ->buildOauth($url, $requestMethod)
+                                 ->performRequest(),true);
+
+      echo '<ul>';
+      foreach($tweetsJSON['statuses'] as $status) {
+        echo '<li><table><tr>';
+        echo '<td><img src="' . $status['user']['profile_image_url'] . '"/></td>';
+        echo '<td>' . $status['user']['name'] . '</td>';
+        echo '<td>' . $status['text'] . '</td>';
+        echo '</tr></table></li>';
+      }
+      echo '</ul>';
+      echo '</td></tr>';
+    } 
+    echo '</table>';
     ?>
 
   </body>
