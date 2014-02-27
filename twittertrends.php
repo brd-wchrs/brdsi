@@ -13,12 +13,16 @@
       -->
 
     <title>Testing Twitter</title>
+
+    <!-- Oh, hi, this links to a very lazily done css file -->
+    <link rel="stylesheet" type="text/css" href="twitter.css">
   </head>
   <body>
 
+    <!-- The form to submit the lat, long, and radius to search trends -->
     <form name="form1" method="POST" action="twittertrends.php">
       <table>
-	<!--
+	<!-- We don't need the query for this one.
 	<tr>
 	  <td>Query:</td>
 	  <td><input type="text" value="#asianproblems" name="query"></td>
@@ -76,23 +80,27 @@
                                 ->performRequest(),true);     
 
     /* Echos the country and the WoeID */
-    echo $closestJSON[0]['country'] . ': ' .  $closestJSON[0]['woeid'] . '<br>';
+    echo "It seems like the closest place with trending information is at the" .
+         " WOEid: " . $closestJSON[0]['woeid'] . " which is in the country " .
+         $closestJSON[0]['country'];
+
+    /* $closestJSON[0]['country'] . ': ' .  $closestJSON[0]['woeid'] . '<br>'; */
 
     /** Now we create the URL that requests the trends of the WOEid **/
     $url = 'https://api.twitter.com/1.1/trends/place.json';
     $getfield = '?id=' . $closestJSON[0]['woeid'] ;
 
-    echo "<p>Here are the top five trends of the area and the top ten tweets of each:</p>" ;
+    echo "<p>Here are the top trends of the area and the top five tweets of each:</p>" ;
 
     $trendsJSON = json_decode( $twitter->setGetfield($getfield)
                                ->buildOauth($url, $requestMethod)
                                 ->performRequest(),true);
 
 
-    echo '<table>';
+    echo '<table id="trendTable">';
     foreach ( $trendsJSON[0]['trends'] as $trend) {
-      echo '<tr>';
-      echo '<td>' . $trend['name'] ;
+      echo '<tr class="trendRow">';
+      echo '<td><p class="trendName">' . $trend['name'] . '</p>' ;
 
       $url = 'https://api.twitter.com/1.1/search/tweets.json';
       $getfield = '?q=' . $trend['name'] . '&geocode=' . $latitude . ',' .
@@ -114,7 +122,10 @@
       echo '</td></tr>';
     } 
     echo '</table>';
+
     ?>
+
+    <img src="media/brd-transp.gif" id="brLogo"/>
 
   </body>
 </html>
