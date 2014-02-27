@@ -102,8 +102,10 @@
       echo '<tr class="trendRow">';
       echo '<td><p class="trendName">' . $trend['name'] . '</p>' ;
 
+      $noSpaceTrend = str_replace( ' ', '%20', $trend['name'] ) ;
+
       $url = 'https://api.twitter.com/1.1/search/tweets.json';
-      $getfield = '?q=' . $trend['name'] . '&geocode=' . $latitude . ',' .
+      $getfield = '?q=' . $noSpaceTrend . '&geocode=' . $latitude . ',' .
                   $longitude . ',' . $radius . 'mi' . '&count=5' ;
 
       $tweetsJSON = json_decode( $twitter->setGetfield($getfield)
