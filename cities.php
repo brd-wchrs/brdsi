@@ -1,13 +1,14 @@
 <html>
   <head>
     <!-- 
-      File: twittertrends.php
+      File: cities.php
       Author: Alan Estrada
     
       Comments because HEINES MAKES ME FEEL BAD 
       
       Literally for just messing around with the basic twitter API.
-      This one is for grabbing the closest trending information.
+      This one is for grabbing trending information for Bahstan, LA
+      and Atlanta.
       
       Using someone else's class TwitterAPIExchange.php for OAuth.
       -->
