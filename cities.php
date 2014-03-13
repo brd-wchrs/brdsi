@@ -20,8 +20,6 @@
   </head>
   <body>
 
-    <p>If you can see it, this works</p>
-
     <?php
 
     require_once('TwitterAPIExchange.php');
