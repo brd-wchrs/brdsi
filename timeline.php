@@ -53,12 +53,26 @@
 
 
     /** Variables to contain data **/
-    $tags = array() ;             // contains the hashtags used
-    $usersMentioned = array() ;   // contains the users mentioned
-    $dates = array() ;            // contains the days in which there were tweets
-    $daysOfWeek = array() ;       // contains the number of tweets per day of the week
-    $favoritedTweets = array() ;  // contains the number of favorites per tweets
+    $tags = array() ;             // contains the hashtags use. example:
+                                  // $tags["kony2012"] => 12
+                                  
 
+    $usersMentioned = array() ;   // contains the users mentioned. example:
+                                  // $usersMentioned["asianfriendbro"] => 5
+
+    $dates = array() ;            // contains the days in which there were tweets
+
+    $daysOfWeek = array() ;       // contains the number of tweets per day of the week
+                                  // indexes are first three letters of day
+                                  // example: $daysOfWeek["Thu"] => 5
+
+    $favoritedTweets = array() ;  // contains the indices of top favorited tweets
+    $topFavoritedTweets = array() ;
+                                  // multi-dimensional array containing the top five
+                                  // favorited tweets. Examples:
+                                  // $topFavoritedTweets[i]["text"] => "hello" 
+                                  // $topFavoritedTweets[i]["created_at"] => "January 25, 2012, 5:32pm"
+                                  // $topFavoritedTweets[i]["favorite_count"] => 12121
 
     $beginDate = '' ;             // contains the date of the earliest tweet received
     $endDate = '' ;               // contains the date of the latest tweet received
@@ -86,7 +100,7 @@
       if ( count($favoritedTweets) < 5 ) {
          $favoritedTweets[] = $count ;
       }
-      elseif ( array_key_exists( "favorite_count" ) 
+      elseif ( array_key_exists( "favorite_count" , $tweet) 
                && !is_null( $tweet["favorite_count"] )) {
 	foreach ( $favoritedTweets as &$tweetNum ) {
 	  if ( $tweet["favorite_count"] > $json[$tweetNum]["favorite_count"] ) {
@@ -159,6 +173,15 @@
     foreach ( $daysOfWeek as &$day ) {
       $day = number_format( ($day / $totalTweets ) * 100, 1) ; 
     }
+
+    /** Store the top five favorited tweets in topFavoritedTweets **/
+    foreach ( $favoritedTweets as $tweetNum ) {
+      $date = $json[$tweetNum]["created_at"] ;
+      $fDate = date('F j, Y, g:ia', strtotime($date)) ;
+      $topFavoritedTweets[] = array( "text" => $json[$tweetNum]["text"],
+                                     "created_at" => $fDate,
+	                             "favorite_count" => $json[$tweetNum]["favorite_count"] ) ;
+    } 
 
     /****** This is where we stop analyzing the stats ******/
 
@@ -240,10 +263,11 @@
 
     echo '<br>' ;
 
+    /** Old stuff 
     echo '<table>';
     echo '<tr><td>Highest Favorited Tweets</td>' . 
 	 '<td>Date</td><td>Number of Favorites</td></tr>' ;
-
+    
     foreach ( $favoritedTweets as $tweetNum ) {
       echo '<tr><td>' . $json[$tweetNum]["text"] . '</td>' ;
       $date = $json[$tweetNum]["created_at"] ;
@@ -251,7 +275,23 @@
       echo '<td>' . $json[$tweetNum]["favorite_count"] . '</td></tr>' ;
       
     }
+
     echo '</table>' ;
+    **/
+      
+
+    echo '<table>';
+    echo '<tr><td>Highest Favorited Tweets</td>' .
+         '<td>Date</td><td>Number of Favorites</td></tr>' ;
+
+    foreach ( $topFavoritedTweets as $tweet ) {
+      echo '<tr><td>' . $tweet["text"] . '</td>' ;
+      echo '<td>' . $tweet["created_at"] . '</td>' ;
+      echo '<td>' . $tweet["favorite_count"] . '</td></tr>' ;
+    }
+
+    echo '</table>' ;
+
 
     /****** This is where we stop displaying our analysis ******/
 
