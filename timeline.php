@@ -67,7 +67,9 @@
 
     $dates = array() ;            // contains the days in which there were tweets
 
-    $daysOfWeek = array() ;       // contains the number of tweets per day of the week
+    $daysOfWeek = array("Sun" => 0, "Mon" => 0,"Tue" => 0,"Wed" => 0,"Thu" => 0,"Fri" => 0,"Sat" => 0,) ;       
+
+                                  // contains the number of tweets per day of the week
                                   // indexes are first three letters of day
                                   // example: $daysOfWeek["Thu"] => 5
 
@@ -87,6 +89,17 @@
     $hashtags = 0 ;               // contains how many times a hashtag was used
 
     $totalTweets = count($json) ; // number of tweets received
+
+    // Variables for the live charts
+    $tagsTextCharts = array() ;
+    $tagsUsageCharts = array() ;
+
+    $usersNameCharts = array() ;
+    $usersUsageCharts = array() ;    
+
+    // colors for the pie chart for Sun, Mon, Tue, ..., Sat
+    $daysColors = array("#D97041", "#C7604C", "#21323D", "#9D9B7F", "#7D4F6D", "#584A5E", "#69D2E7") ;
+    $daysData = array() ;
 
     /** Iterate through the json of tweets to analyze data **/
     $count = 0 ;
@@ -153,9 +166,7 @@
     arsort($tags) ;
     arsort($usersMentioned);
 
-    /** Create the arrays needed to build a live chart for tags **/
-    $tagsTextCharts = array() ;
-    $tagsUsageCharts = array() ;
+    /** Populate the arrays needed to build a live chart for tags **/
     $count = 0 ;
     foreach ( $tags as $tag => $value ) {
       if ( $count > 10 || $value == 0 ) {
@@ -167,9 +178,7 @@
       $count++ ;
     }
 
-    /** Create the arrays needed to build a live chart for the user mentions **/
-    $usersNameCharts = array() ;
-    $usersUsageCharts = array() ;
+    /** Populate the arrays needed to build a live chart for the user mentions **/
     $count = 0 ;
     foreach ( $usersMentioned as $user => $value ) {
       if ( $count > 10 || $value == 0 ) {
@@ -179,6 +188,13 @@
       $usersNameCharts[] = $user ;
       $usersUsageCharts[] = $value ;
       $count++ ;
+    }
+
+    /** Populate the arrays needed to build a live chart for the user mentions **/
+    $count = 0 ;
+    foreach (  $daysOfWeek as $day => $value ) {
+      array_push( $daysData, array( "value" => $value, "color" => $daysColors[$count] ));
+      $count++;
     }
 
     /** Counts percentage of total tweets are retweets **/
@@ -320,7 +336,10 @@
     }
 
     echo '</table>';
+    echo '<br>' ;
 
+    /** Pie chart for days tweeted **/
+    echo '<canvas id="daysChart" width="600" height="400"></canvas>' ;
     echo '<br>' ;
 
     echo '<table>';
@@ -418,10 +437,12 @@
 
       new Chart(usersChart).Bar(usersData, usersOption);
 
-
-
+      // This part creates a live chart for the days tweeted
+      var daysData = <?php echo json_encode($daysData); ?>;
+      var daysChart = document.getElementById("daysChart").getContext("2d");
+      
+      new Chart(daysChart).PolarArea(daysData) ;
     </script>
 
   </body>
 </html>
-
