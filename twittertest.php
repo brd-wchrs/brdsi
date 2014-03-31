@@ -12,6 +12,23 @@
       -->
 
     <title>Testing Twitter</title>
+
+    <!-- The following resource is adopted and adapted from http://api.mygeoposition.com/geopicker/ -->
+
+    <script src="http://api.mygeoposition.com/api/geopicker/api.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        function lookupGeoData() {            
+            myGeoPositionGeoPicker({
+                startAddress     : 'White House, Washington',
+                returnFieldMap   : {
+                                     'geoposition1a' : '<LAT>',
+                                     'geoposition1b' : '<LNG>',
+                                   }
+            });
+        }
+    </script>
+
+
   </head>
   <body>
 
@@ -23,11 +40,11 @@
 	</tr>
 	<tr>
 	  <td>Latitude:</td>
-	  <td><input type="text" value="32.09" name="latitude"></td>
+	  <td><input type="text" id="geoposition1a" value="32.09" name="latitude"></td>
 	</tr>
 	<tr>
 	  <td>Longitude:</td>
-	  <td><input type="text" value="-70.012" name="longitude"></td>
+	  <td><input type="text" id="geoposition12" value="-70.012" name="longitude"></td>
 	</tr>
 	<tr>
 	  <td>Radius (mi):</td>
@@ -35,7 +52,7 @@
 	</tr>
 	<tr>
 	  <td><input type="submit" name="querySubmit" value="Search"></td>
-	  <td></td>
+	  <td><button type="button" onclick="lookupGeoData();">Open GeoPicker</button></td>
 	</tr>
       </table>
     </form>
