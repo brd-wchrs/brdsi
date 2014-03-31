@@ -9,6 +9,8 @@
       Literally for just messing around with the basic twitter API.
       
       Using someone else's class TwitterAPIExchange.php for OAuth.
+
+      This also needs to unirest-php and ChartJS for this to work.
       -->
 
     <title>Parsing Timelines</title>
@@ -165,6 +167,19 @@
       $count++ ;
     }
 
+    /** Create the arrays needed to build a live chart for the user mentions **/
+    $usersNameCharts = array() ;
+    $usersUsageCharts = array() ;
+    $count = 0 ;
+    foreach ( $usersMentioned as $user => $value ) {
+      if ( $count > 10 || $value == 0 ) {
+        break ;
+      }
+
+      $usersNameCharts[] = $user ;
+      $usersUsageCharts[] = $value ;
+      $count++ ;
+    }
 
     /** Counts percentage of total tweets are retweets **/
     $retweets = ($retweets / $totalTweets) * 100 ;
@@ -256,8 +271,12 @@
       }
     }
     echo '</table>';
-
     echo '<br>' ;
+
+    /** Bar chart for userNames mentioned **/
+    echo '<canvas id="usersChart" width="600" height="400"></canvas>' ;
+    echo '<br>' ;
+
 
     /** Display breakdown of percentage of tweets per weekday **/
     echo '<table>';
@@ -327,7 +346,7 @@
 
 
     <script type="text/javascript">
-      
+      // This part creates the live chart for the hashtags
       var tagsText = <?php echo json_encode($tagsTextCharts); ?>;
       var tagsUsage = <?php echo json_encode($tagsUsageCharts); ?>;
 
@@ -343,8 +362,6 @@
           }
         ] 
       } ;
-
-      
 
       var tagsChart = document.getElementById("tagsChart").getContext("2d");
       var tagsOption = {
@@ -364,6 +381,44 @@
       };
 
       new Chart(tagsChart).Bar(tagsData, tagsOption);
+
+      // This part creates the live chart for the user mentions
+      var usersNames = <?php echo json_encode($usersNameCharts); ?>;
+      var usersUsage = <?php echo json_encode($usersUsageCharts); ?>;
+
+      usersStep = Math.ceil(usersUsage[0] / 10 ) ;
+
+      var usersData = {
+        labels : usersNames,
+        datasets : [
+          {
+            fillColor : "#48A497",
+            strokeColor : "#48A4D1",
+            data : usersUsage
+          }
+        ]
+      } ;
+
+      var usersChart = document.getElementById("usersChart").getContext("2d");
+      var usersOption = {
+      scaleOverlay : true,
+
+        //Boolean - If we want to override with a hard coded scale
+        scaleOverride : true,
+
+        //** Required if scaleOverride is true **
+        //Number - The number of steps in a hard coded scale
+        scaleSteps : 10,
+        //Number - The value jump in the hard coded scale
+        scaleStepWidth : tagsStep,
+        //Number - The scale starting value
+        scaleStartValue : 0,
+        barDatasetSpacing : 10,
+      };
+
+      new Chart(usersChart).Bar(usersData, usersOption);
+
+
 
     </script>
 
