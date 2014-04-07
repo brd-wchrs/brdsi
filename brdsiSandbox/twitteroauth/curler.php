@@ -14,11 +14,10 @@ and open the template in the editor.
       // from http://www.php.net/manual/en/curl.examples.php
       function cURLcheckBasicFunctions() 
       { 
-        if( !function_exists("curl_init") && 
-            !function_exists("curl_setopt") && 
-            !function_exists("curl_exec") && 
-            !function_exists("curl_close") ) return false; 
-        else return true; 
+         return ( function_exists("curl_init") && 
+                  function_exists("curl_setopt") && 
+                  function_exists("curl_exec") && 
+                  function_exists("curl_close") ) ; 
       }         
       
       echo cURLcheckBasicFunctions() ? "we good" : "fk, nope, no curl here" ;
